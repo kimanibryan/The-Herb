@@ -1,13 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Medicine } from '../types';
-import { Camera, Package, AlertTriangle, Users, Search, Plus, Loader2, CheckCircle2, Filter, Leaf } from 'lucide-react';
+import { Camera, Package, AlertTriangle, Users, Search, Plus, Loader2, CheckCircle2, Filter, Leaf, Clock } from 'lucide-react';
 import { parseMedicineImage } from '../services/geminiService';
 
 const MOCK_INVENTORY: Medicine[] = [
   { id: '1', name: 'Amoxicillin', dosage: '500mg', price: 12.50, stock: 50, expiryDate: '2025-10-12', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Antibiotics', description: 'Sample desc' },
   { id: '2', name: 'Panadol Extra', dosage: '500mg', price: 6.00, stock: 120, expiryDate: '2025-04-10', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Pain Relief', description: 'Sample desc' },
-  { id: '3', name: 'Antacid Gel', dosage: '200ml', price: 15.00, stock: 15, expiryDate: '2025-03-01', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Gastric', description: 'Sample desc' },
+  { id: '3', name: 'Antacid Gel', dosage: '200ml', price: 15.00, stock: 15, expiryDate: '2025-03-25', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Gastric', description: 'Sample desc' },
+  { id: '4', name: 'Cetirizine', dosage: '10mg', price: 6.50, stock: 60, expiryDate: '2025-05-10', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Allergy', description: 'Sample desc' },
+  { id: '5', name: 'Salbutamol', dosage: '100mcg', price: 25.00, stock: 8, expiryDate: '2025-06-30', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Respiratory', description: 'Sample desc' },
+  { id: '6', name: 'Metformin', dosage: '850mg', price: 18.00, stock: 40, expiryDate: '2025-08-15', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Diabetes', description: 'Sample desc' },
+  { id: '7', name: 'Atorvastatin', dosage: '20mg', price: 22.00, stock: 30, expiryDate: '2025-09-01', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Cholesterol', description: 'Sample desc' },
+  { id: '8', name: 'Vitamin D3', dosage: '1000IU', price: 14.00, stock: 150, expiryDate: '2026-03-10', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Vitamins', description: 'Sample desc' },
+  { id: '9', name: 'Amlodipine', dosage: '5mg', price: 11.50, stock: 95, expiryDate: '2025-05-28', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Heart', description: 'Sample desc' },
+  { id: '10', name: 'Levothyroxine', dosage: '50mcg', price: 9.00, stock: 200, expiryDate: '2025-11-20', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Thyroid', description: 'Sample desc' },
+  { id: '11', name: 'Multivitamin Syrup', dosage: '200ml', price: 12.00, stock: 45, expiryDate: '2025-07-05', chemistId: 'c1', chemistName: 'The Herb Admin', category: 'Vitamins', description: 'Sample desc' },
 ];
 
 const ChemistHome: React.FC = () => {
@@ -51,12 +59,39 @@ const ChemistHome: React.FC = () => {
     setActiveTab('inventory');
   };
 
-  const nearExpiryMeds = inventory.filter(m => {
-    const expiry = new Date(m.expiryDate);
+  const getUrgencyData = (expiryDateStr: string) => {
+    const expiry = new Date(expiryDateStr);
     const now = new Date();
+    const diffTime = expiry.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const diffMonths = (expiry.getFullYear() - now.getFullYear()) * 12 + (expiry.getMonth() - now.getMonth());
-    return diffMonths <= 5;
-  });
+
+    let bgColor = 'bg-white';
+    let urgencyLevel = 'Normal';
+
+    if (diffMonths <= 1) {
+      bgColor = 'bg-red-50 border-red-200';
+      urgencyLevel = 'Critical (1 month)';
+    } else if (diffMonths <= 2) {
+      bgColor = 'bg-orange-50 border-orange-200';
+      urgencyLevel = 'Urgent (2 months)';
+    } else if (diffMonths <= 3) {
+      bgColor = 'bg-green-50 border-green-200';
+      urgencyLevel = 'Active Monitoring (3 months)';
+    } else if (diffMonths <= 5) {
+      bgColor = 'bg-sky-50 border-sky-100';
+      urgencyLevel = 'B2B Eligible (5 months)';
+    }
+
+    return { diffDays, diffMonths, bgColor, urgencyLevel };
+  };
+
+  const nearExpiryMeds = useMemo(() => {
+    return inventory
+      .map(m => ({ ...m, ...getUrgencyData(m.expiryDate) }))
+      .filter(m => m.diffMonths <= 5)
+      .sort((a, b) => a.diffDays - b.diffDays);
+  }, [inventory]);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -114,7 +149,7 @@ const ChemistHome: React.FC = () => {
                   <th className="px-10 py-6 text-center">Dosage</th>
                   <th className="px-10 py-6 text-center">Qty</th>
                   <th className="px-10 py-6 text-center">Unit Price</th>
-                  <th className="px-10 py-6 text-center">Action</th>
+                  <th className="px-10 py-6 text-center">Expiry</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -131,11 +166,7 @@ const ChemistHome: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-10 py-8 text-center font-black text-sky-600 text-lg">${med.price.toFixed(2)}</td>
-                    <td className="px-10 py-8 text-center">
-                      <button className="bg-slate-50 hover:bg-sky-100 p-3 rounded-xl transition-colors text-sky-600">
-                        <Filter className="w-5 h-5" />
-                      </button>
-                    </td>
+                    <td className="px-10 py-8 text-center text-sm font-medium text-slate-400">{med.expiryDate}</td>
                   </tr>
                 ))}
               </tbody>
@@ -155,38 +186,41 @@ const ChemistHome: React.FC = () => {
             <Users className="absolute -bottom-10 -right-10 w-72 h-72 text-white/10" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {nearExpiryMeds.length > 0 ? nearExpiryMeds.map(med => (
-              <div key={med.id} className="bg-white p-10 rounded-[40px] border border-orange-100 shadow-sm flex items-center justify-between group hover:border-orange-300 transition-all">
-                <div className="flex items-center gap-6">
-                  <div className="bg-orange-50 p-5 rounded-[24px]">
-                    <AlertTriangle className="w-10 h-10 text-orange-500" />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-2xl text-slate-800">{med.name}</h4>
-                    <p className="text-sm text-orange-600 font-bold uppercase tracking-widest mt-1">Exp: {med.expiryDate}</p>
-                    <div className="flex gap-2 mt-4">
-                      <span className="text-[10px] bg-slate-100 px-3 py-1.5 rounded-xl uppercase font-black text-slate-500 tracking-wider">STOCK: {med.stock}</span>
+          {/* New Urgency Monitor Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 px-2">
+              <Clock className="w-6 h-6 text-sky-600" />
+              <h3 className="text-2xl font-black text-slate-900">Expiry Urgency Monitor</h3>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              {nearExpiryMeds.length > 0 ? nearExpiryMeds.map(med => (
+                <div key={med.id} className={`p-8 rounded-[32px] border-2 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ${med.bgColor}`}>
+                  <div className="flex items-center gap-6">
+                    <div className="p-4 rounded-2xl bg-white/50 backdrop-blur-sm shadow-sm">
+                      <AlertTriangle className={`w-8 h-8 ${med.diffMonths <= 1 ? 'text-red-500' : med.diffMonths <= 2 ? 'text-orange-500' : 'text-green-600'}`} />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-xl text-slate-900">{med.name}</h4>
+                      <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">{med.dosage} • {med.category}</p>
+                      <div className="mt-2 inline-block px-3 py-1 rounded-lg bg-white/60 text-[10px] font-black uppercase tracking-tighter text-slate-600">
+                        Status: {med.urgencyLevel}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right flex flex-col items-end gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm line-through text-slate-300 font-bold">${med.price.toFixed(2)}</span>
-                    <span className="text-3xl font-black text-emerald-600">${(med.price * 0.6).toFixed(2)}</span>
+                  <div className="flex flex-col md:items-end">
+                    <p className="text-3xl font-black text-slate-900">{med.diffDays} <span className="text-sm font-bold text-slate-400">Days Left</span></p>
+                    <p className="text-xs font-bold text-slate-400">Expires: {med.expiryDate}</p>
+                    <button className="mt-4 bg-sky-600 hover:bg-sky-700 text-white text-xs font-black px-8 py-3 rounded-2xl shadow-lg transition-all active:scale-95">
+                      Boost Peer Deal
+                    </button>
                   </div>
-                  <button className="bg-sky-600 hover:bg-sky-700 text-white text-sm font-black px-8 py-3 rounded-2xl shadow-xl shadow-sky-100 transition-all hover:-translate-y-1 active:scale-95">
-                    Peer Deal
-                  </button>
                 </div>
-              </div>
-            )) : (
-              <div className="col-span-2 bg-slate-50 py-24 rounded-[50px] border-4 border-dashed border-slate-100 text-center flex flex-col items-center gap-4">
-                <CheckCircle2 className="w-16 h-16 text-slate-300" />
-                <p className="text-slate-400 font-black text-xl uppercase tracking-widest">Perfect Shelf Life</p>
-                <p className="text-slate-400 font-medium max-w-xs">You have no items expiring in the next 5 months. Excellent inventory management!</p>
-              </div>
-            )}
+              )) : (
+                <div className="py-16 text-center border-4 border-dashed border-slate-100 rounded-[40px]">
+                  <p className="text-slate-400 font-black text-lg">No Items in Urgency Window</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

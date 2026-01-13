@@ -4,10 +4,18 @@ import { Medicine } from '../types';
 import { Search, Filter, Leaf, Plus, Star, MapPin } from 'lucide-react';
 
 const MOCK_MEDS: Medicine[] = [
-  { id: '1', name: 'Amoxicillin', dosage: '500mg', price: 12.50, stock: 50, expiryDate: '2025-10-12', chemistId: 'c1', chemistName: 'Green Cross Pharma', category: 'Antibiotics', description: 'Used to treat bacterial infections.' },
-  { id: '2', name: 'Paracetamol', dosage: '1000mg', price: 4.20, stock: 100, expiryDate: '2026-05-15', chemistId: 'c2', chemistName: 'The Herb Wellness', category: 'Pain Relief', description: 'Quick relief for fever and mild pain.' },
-  { id: '3', name: 'Loratadine', dosage: '10px', price: 8.90, stock: 30, expiryDate: '2025-02-20', chemistId: 'c1', chemistName: 'Green Cross Pharma', category: 'Allergy', description: 'Non-drowsy relief from allergic rhinitis.', nearExpiryDiscount: 20 },
-  { id: '4', name: 'Vitamin C', dosage: '500mg', price: 15.00, stock: 200, expiryDate: '2025-08-01', chemistId: 'c3', chemistName: 'Nature Path', category: 'Vitamins', description: 'Boosts immune system.' },
+  { id: '1', name: 'Amoxicillin', dosage: '500mg', price: 12.50, stock: 50, expiryDate: '2025-10-12', chemistId: 'c1', chemistName: 'Green Cross Pharma', category: 'Antibiotics', description: 'Broad-spectrum antibiotic for bacterial infections.' },
+  { id: '2', name: 'Paracetamol', dosage: '1000mg', price: 4.20, stock: 100, expiryDate: '2026-05-15', chemistId: 'c2', chemistName: 'The Herb Wellness', category: 'Pain Relief', description: 'Effective relief for mild to moderate pain and fever.' },
+  { id: '3', name: 'Loratadine', dosage: '10mg', price: 8.90, stock: 30, expiryDate: '2025-05-20', chemistId: 'c1', chemistName: 'Green Cross Pharma', category: 'Allergy', description: 'Non-drowsy antihistamine for seasonal allergy relief.', nearExpiryDiscount: 20 },
+  { id: '4', name: 'Vitamin C', dosage: '500mg', price: 15.00, stock: 200, expiryDate: '2025-08-01', chemistId: 'c3', chemistName: 'Nature Path', category: 'Vitamins', description: 'Essential nutrient for immune support and skin health.' },
+  { id: '5', name: 'Ibuprofen', dosage: '400mg', price: 7.50, stock: 85, expiryDate: '2025-12-20', chemistId: 'c2', chemistName: 'The Herb Wellness', category: 'Pain Relief', description: 'Anti-inflammatory for pain, swelling, and fever.' },
+  { id: '6', name: 'Metformin', dosage: '850mg', price: 18.00, stock: 40, expiryDate: '2025-06-15', chemistId: 'c1', chemistName: 'Green Cross Pharma', category: 'Diabetes', description: 'Management of type 2 diabetes.' },
+  { id: '7', name: 'Cetirizine', dosage: '10mg', price: 6.50, stock: 60, expiryDate: '2025-04-10', chemistId: 'c3', chemistName: 'Nature Path', category: 'Allergy', description: 'Relief from sneezing, runny nose, and itchy eyes.', nearExpiryDiscount: 30 },
+  { id: '8', name: 'Omega-3 Fish Oil', dosage: '1000mg', price: 22.00, stock: 45, expiryDate: '2026-02-14', chemistId: 'c3', chemistName: 'Nature Path', category: 'Vitamins', description: 'Supports heart, brain, and eye health.' },
+  { id: '9', name: 'Salbutamol Inhaler', dosage: '100mcg', price: 25.00, stock: 12, expiryDate: '2025-04-30', chemistId: 'c2', chemistName: 'The Herb Wellness', category: 'Respiratory', description: 'Quick relief for asthma and COPD symptoms.', nearExpiryDiscount: 15 },
+  { id: '10', name: 'Magnesium Citrate', dosage: '200mg', price: 14.50, stock: 55, expiryDate: '2025-11-05', chemistId: 'c3', chemistName: 'Nature Path', category: 'Vitamins', description: 'Supports muscle function and nerve health.' },
+  { id: '11', name: 'Omeprazole', dosage: '20mg', price: 10.20, stock: 70, expiryDate: '2025-07-22', chemistId: 'c1', chemistName: 'Green Cross Pharma', category: 'Gastric', description: 'Treatment for acid reflux and heartburn.' },
+  { id: '12', name: 'B-Complex', dosage: 'High Potency', price: 13.00, stock: 90, expiryDate: '2026-08-30', chemistId: 'c3', chemistName: 'Nature Path', category: 'Vitamins', description: 'Energy metabolism and nervous system support.' },
 ];
 
 const CustomerHome: React.FC<{ addToCart: (m: Medicine) => void }> = ({ addToCart }) => {
