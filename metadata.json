@@ -1,0 +1,7 @@
+{
+  "name": "The Herb",
+  "description": "Your digital gateway to local pharmacies and peer-to-peer pharmaceutical stock management.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
