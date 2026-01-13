@@ -1,6 +1,6 @@
 {
-  "name": "The Herb",
-  "description": "Your digital gateway to local pharmacies and peer-to-peer pharmaceutical stock management.",
+  "name": "PharmaConnect",
+  "description": "A dual-sided marketplace for medicine ordering and B2B pharmaceutical inventory management with AI-powered stock entry.",
   "requestFramePermissions": [
     "camera"
   ]
